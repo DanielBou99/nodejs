@@ -34,7 +34,7 @@ class AuthorController {
     const id = req.params.id;
     authors.findByIdAndUpdate(id, {$set: req.body}, (err) => {
       if (!err) {
-        res.status(200).send({message: 'author updated'})
+        res.status(200).send({message: "author updated"});
       } else {
         res.status(500).send({message: `${err.message} - Error updating author`});
       }
@@ -45,7 +45,7 @@ class AuthorController {
     const id = req.params.id;
     authors.findByIdAndDelete(id, (err) => {
       if (!err) {
-        res.status(200).send({message: 'author deleted'})
+        res.status(200).send({message: "author deleted"});
       } else {
         res.status(500).send({message: `${err.message} - Error deleting author`});
       }

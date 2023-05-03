@@ -4,7 +4,7 @@ class BookController {
 
   static getAll = (req, res) => {
     books.find()
-      .populate('author')
+      .populate("author")
       .exec((err, books) => {
         res.status(200).json(books);
       });
@@ -12,7 +12,7 @@ class BookController {
   
   static getByPublisher = (req, res) => {
     const publisher = req.query.publisher;
-    books.find({'publisher': publisher}, {}, (err, books) => {
+    books.find({"publisher": publisher}, {}, (err, books) => {
       res.status(200).send(books);
     });
   };
@@ -20,7 +20,7 @@ class BookController {
   static getById = (req, res) => {
     const id = req.params.id;
     books.findById(id)
-      .populate('author', 'name')
+      .populate("author", "name")
       .exec((err, book) => {
         if (err) {
           res.status(400).send({message: `${err.message} - Error finding book by id`});
@@ -45,7 +45,7 @@ class BookController {
     const id = req.params.id;
     books.findByIdAndUpdate(id, {$set: req.body}, (err) => {
       if (!err) {
-        res.status(200).send({message: 'Book updated'})
+        res.status(200).send({message: "Book updated"});
       } else {
         res.status(500).send({message: `${err.message} - Error updating book`});
       }
@@ -56,7 +56,7 @@ class BookController {
     const id = req.params.id;
     books.findByIdAndDelete(id, (err) => {
       if (!err) {
-        res.status(200).send({message: 'Book deleted'})
+        res.status(200).send({message: "Book deleted"});
       } else {
         res.status(500).send({message: `${err.message} - Error deleting book`});
       }
