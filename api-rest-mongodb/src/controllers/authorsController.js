@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import authors from "../models/Author.js";
 
 class AuthorController {
@@ -15,9 +16,18 @@ class AuthorController {
     try {
       const id = req.params.id;
       const authorResult = await authors.findById(id);
-      res.status(200).send(authorResult);
+
+      if (authorResult !== null) {
+        res.status(200).send(authorResult);
+      } else {
+        res.status(404).send({message: `${id} - ID Author not found.`});
+      }
     } catch (error) {
-      res.status(400).send({message: `${error.message} - ID Author not found.`});
+      if (error instanceof mongoose.Error.CastError) {
+        res.status(400).send({message: "Incorrect ID requested"});  
+      } else {
+        res.status(500).send({message: `${error.message} - Server Error`});
+      }       
     }
   };
 
