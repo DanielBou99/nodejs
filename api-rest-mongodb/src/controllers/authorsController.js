@@ -2,54 +2,53 @@ import authors from "../models/Author.js";
 
 class AuthorController {
 
-  static getAll = (req, res) => {
-    authors.find((err, authors) => {
-      res.status(200).json(authors);
-    });
+  static getAll = async (req, res) => {
+    try {
+      const authorsResult = await authors.find();
+      res.status(200).json(authorsResult);
+    } catch (error) {
+      res.status(500).json({message: "Error to find authors"});
+    }
   };
 
-  static getById = (req, res) => {
-    const id = req.params.id;
-    authors.findById(id, (err, author) => {
-      if (err) {
-        res.status(400).send({message: `${err.message} - Error finding author by id`});
-      } else {
-        res.status(200).json(author);
-      }
-    });
+  static getById = async (req, res) => {
+    try {
+      const id = req.params.id;
+      const authorResult = await authors.findById(id);
+      res.status(200).send(authorResult);
+    } catch (error) {
+      res.status(400).send({message: `${error.message} - ID Author not found.`});
+    }
   };
 
-  static new = (req, res) => {
-    let author = new authors(req.body);
-    author.save((err) => {
-      if (err) {
-        res.status(500).send({message: `${err.message} - Error saving author`});
-      } else {
-        res.status(201).send(author.toJSON());
-      }
-    });
+  static new = async (req, res) => {
+    try {
+      let author = new authors(req.body);
+      await author.save();
+      res.status(201).send(author.toJSON());
+    } catch (error) {
+      res.status(500).send({message: `${error.message} - Error saving author`});
+    }
   };
 
-  static update = (req, res) => {
-    const id = req.params.id;
-    authors.findByIdAndUpdate(id, {$set: req.body}, (err) => {
-      if (!err) {
-        res.status(200).send({message: "author updated"});
-      } else {
-        res.status(500).send({message: `${err.message} - Error updating author`});
-      }
-    });
+  static update = async (req, res) => {
+    try {
+      const id = req.params.id;
+      await authors.findByIdAndUpdate(id, {$set: req.body});
+      res.status(200).send({message: "author updated"});
+    } catch (error) {
+      res.status(500).send({message: `${error.message} - Error updating author`});
+    }
   };
 
-  static delete = (req, res) => {
-    const id = req.params.id;
-    authors.findByIdAndDelete(id, (err) => {
-      if (!err) {
-        res.status(200).send({message: "author deleted"});
-      } else {
-        res.status(500).send({message: `${err.message} - Error deleting author`});
-      }
-    });
+  static delete = async (req, res) => {
+    try {
+      const id = req.params.id;
+      await authors.findByIdAndDelete(id);
+      res.status(200).send({message: "author deleted"});
+    } catch (error) {
+      res.status(500).send({message: `${error.message} - Error deleting author`});
+    }
   };
   
 }
