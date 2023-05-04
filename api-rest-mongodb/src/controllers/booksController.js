@@ -2,65 +2,73 @@ import books from "../models/Book.js";
 
 class BookController {
 
-  static getAll = (req, res) => {
-    books.find()
-      .populate("author")
-      .exec((err, books) => {
-        res.status(200).json(books);
-      });
+  static getAll = async (req, res, next) => {
+    try {
+      const booksResult = await books.find()
+        .populate("author")
+        .exec();
+      res.status(200).json(booksResult);
+    } catch(error) {
+      next(error);
+    }
+
   };
   
-  static getByPublisher = (req, res) => {
-    const publisher = req.query.publisher;
-    books.find({"publisher": publisher}, {}, (err, books) => {
-      res.status(200).send(books);
-    });
+  static getByPublisher = async (req, res, next) => {
+    try {
+      const publisher = req.query.publisher;
+      const booksResult = await books.find({"publisher": publisher}, {});
+      res.status(200).send(booksResult);
+    } catch (error) {
+      next(error);
+    }
   };
 
-  static getById = (req, res) => {
-    const id = req.params.id;
-    books.findById(id)
-      .populate("author", "name")
-      .exec((err, book) => {
-        if (err) {
-          res.status(400).send({message: `${err.message} - Error finding book by id`});
-        } else {
-          res.status(200).json(book);
-        }
-      });
-  };
+  static getById = async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      const bookResult = await books.findById(id)
+        .populate("author", "name")
+        .exec();
 
-  static new = (req, res) => {
-    let book = new books(req.body);
-    book.save((err) => {
-      if (err) {
-        res.status(500).send({message: `${err.message} - Error saving book`});
+      if (bookResult !== null) {
+        res.status(200).send(bookResult);
       } else {
-        res.status(201).send(book.toJSON());
+        res.status(404).send({message: `${id} - ID book not found.`});
       }
-    });
+    } catch(error) {
+      next(error);
+    }
   };
 
-  static update = (req, res) => {
-    const id = req.params.id;
-    books.findByIdAndUpdate(id, {$set: req.body}, (err) => {
-      if (!err) {
-        res.status(200).send({message: "Book updated"});
-      } else {
-        res.status(500).send({message: `${err.message} - Error updating book`});
-      }
-    });
+  static new = async (req, res, next) => {
+    try {
+      let book = new books(req.body);
+      const bookResult = await book.save();
+      res.status(201).send(bookResult.toJSON());
+    } catch(error) {
+      next(error);
+    }
   };
 
-  static delete = (req, res) => {
-    const id = req.params.id;
-    books.findByIdAndDelete(id, (err) => {
-      if (!err) {
-        res.status(200).send({message: "Book deleted"});
-      } else {
-        res.status(500).send({message: `${err.message} - Error deleting book`});
-      }
-    });
+  static update = async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      await books.findByIdAndUpdate(id, {$set: req.body});
+      res.status(200).send({message: "Book updated"});
+    } catch(error) {
+      next(error);
+    }
+  };
+
+  static delete = async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      await books.findByIdAndDelete(id);
+      res.status(200).send({message: "Book deleted"});
+    } catch(error) {
+      next(error);
+    }
   };
   
 }

@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import authors from "../models/Author.js";
 
 class AuthorController {
@@ -12,7 +11,7 @@ class AuthorController {
     }
   };
 
-  static getById = async (req, res) => {
+  static getById = async (req, res, next) => {
     try {
       const id = req.params.id;
       const authorResult = await authors.findById(id);
@@ -23,41 +22,37 @@ class AuthorController {
         res.status(404).send({message: `${id} - ID Author not found.`});
       }
     } catch (error) {
-      if (error instanceof mongoose.Error.CastError) {
-        res.status(400).send({message: "Incorrect ID requested"});  
-      } else {
-        res.status(500).send({message: `${error.message} - Server Error`});
-      }       
+      next(error);
     }
   };
 
-  static new = async (req, res) => {
+  static new = async (req, res, next) => {
     try {
       let author = new authors(req.body);
       await author.save();
       res.status(201).send(author.toJSON());
     } catch (error) {
-      res.status(500).send({message: `${error.message} - Error saving author`});
+      next(error);
     }
   };
 
-  static update = async (req, res) => {
+  static update = async (req, res, next) => {
     try {
       const id = req.params.id;
       await authors.findByIdAndUpdate(id, {$set: req.body});
       res.status(200).send({message: "author updated"});
     } catch (error) {
-      res.status(500).send({message: `${error.message} - Error updating author`});
+      next(error);
     }
   };
 
-  static delete = async (req, res) => {
+  static delete = async (req, res, next) => {
     try {
       const id = req.params.id;
       await authors.findByIdAndDelete(id);
       res.status(200).send({message: "author deleted"});
     } catch (error) {
-      res.status(500).send({message: `${error.message} - Error deleting author`});
+      next(error);
     }
   };
   
