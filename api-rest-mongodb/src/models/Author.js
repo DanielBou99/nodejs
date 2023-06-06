@@ -7,7 +7,15 @@ const authorSchema = new mongoose.Schema(
       type: String, 
       required: [true, "Author name is required"] 
     },
-    country: { type: String },
+    country: {
+      type: String,
+      validate: {
+        validator: (country) => {
+          return country.toUpperCase() === "BRAZIL";
+        },
+        message: "The country {VALUE} is not allowed."
+      }
+    },
   },
   {
     versionKey: false
