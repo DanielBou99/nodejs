@@ -8,7 +8,7 @@ class AuthorController {
       const authorsResult = await authors.find();
       res.status(200).json(authorsResult);
     } catch (error) {
-      res.status(500).json({message: "Error to find authors"});
+      res.status(500).json({message: "Error to find authors."});
     }
   };
 
@@ -40,8 +40,12 @@ class AuthorController {
   static update = async (req, res, next) => {
     try {
       const id = req.params.id;
-      await authors.findByIdAndUpdate(id, {$set: req.body});
-      res.status(200).send({message: "author updated"});
+      const authorResult = await authors.findByIdAndUpdate(id, {$set: req.body});
+      if (authorResult != null) {
+        res.status(200).send({message: "author updated."});
+      } else {
+        next(new NotFound("Author not found."));
+      }
     } catch (error) {
       next(error);
     }
@@ -50,8 +54,12 @@ class AuthorController {
   static delete = async (req, res, next) => {
     try {
       const id = req.params.id;
-      await authors.findByIdAndDelete(id);
-      res.status(200).send({message: "author deleted"});
+      const authorResult = await authors.findByIdAndDelete(id);
+      if (authorResult != null) {
+        res.status(200).send({message: "author deleted."});
+      } else {
+        next(new NotFound("Author not found."));
+      }
     } catch (error) {
       next(error);
     }
