@@ -18,8 +18,12 @@ class BookController {
   static getByFilter = async (req, res, next) => {
     try {
       const search = await processSearch(req.query);
-      const booksResult = await books.find(search).populate("author");
-      res.status(200).send(booksResult);
+      if (search != null) {
+        const booksResult = await books.find(search).populate("author");
+        res.status(200).send(booksResult);
+      } else {
+        res.status(200).send([]);
+      }
     } catch (error) {
       next(error);
     }
@@ -82,18 +86,21 @@ class BookController {
 
 }
 
-function processSearch(params) {
-  const { publisher, title, minPages, maxPages, nameAuthor } = params;
-  const search = {};
+async function processSearch(params) {
+  const { publisher, title, minPages, maxPages, authorName } = params;
+  let search = {};
   if (publisher) search.publisher = publisher;
   if (title) search.title = { $regex: title, $options: "i" };
   if (minPages || maxPages) search.pages = {};
   if (minPages) search.pages.$gte = minPages;
   if (maxPages) search.pages.$lte = maxPages;
-  if (nameAuthor) {
-    const author = authors.findOne({name: nameAuthor});
-    const authorId = author._id;
-    search.author = authorId;
+  if (authorName) {
+    const author = await authors.findOne({name: authorName});
+    if (author != null) {
+      search.author = author._id;
+    } else {
+      search = null;
+    }
   }
   return search;
 }
