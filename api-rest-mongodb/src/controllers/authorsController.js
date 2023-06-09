@@ -3,10 +3,11 @@ import NotFound from "../errors/NotFound.js";
 
 class AuthorController {
 
-  static getAll = async (req, res) => {
+  static getAll = async (req, res, next) => {
     try {
-      const authorsResult = await authors.find();
-      res.status(200).json(authorsResult);
+      const authorsResult = authors.find();
+      req.result = authorsResult;
+      next();
     } catch (error) {
       res.status(500).json({message: "Error to find authors."});
     }

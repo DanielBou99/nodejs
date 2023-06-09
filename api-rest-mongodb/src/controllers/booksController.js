@@ -1,36 +1,16 @@
 import {books, authors} from "../models/index.js";
 import NotFound from "../errors/NotFound.js";
-import IncorrectRequest from "../errors/IncorrectRequest.js";
 
 class BookController {
 
   static getAll = async (req, res, next) => {
     try {
-      let { limit = 2, page = 1, order = "_id:-1" } = req.query;
-
-      let [sortingField,sortDirection] = order.split(":");
-
-      limit = parseInt(limit);
-      page = parseInt(page);
-      sortDirection = parseInt(sortDirection);
-
-      if (limit > 0 && page > 0) {
-        const booksResult = await books.find()
-          .sort({ [sortingField]: sortDirection })
-          .skip((page-1) * limit)
-          .limit(limit)
-          .populate("author")
-          .exec();
-        res.status(200).json(booksResult);
-      } else {
-        next(new IncorrectRequest);
-      }
-
-      
+      const searchBooks = books.find();
+      req.result = searchBooks;
+      next();
     } catch(error) {
       next(error);
     }
-
   };
   
   static getByFilter = async (req, res, next) => {
